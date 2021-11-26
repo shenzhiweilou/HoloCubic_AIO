@@ -58,8 +58,8 @@ void setup()
     app_contorller->app_register(&settings_app);
     app_contorller->app_register(&file_manager_app);
 
-    // 优先显示屏幕 加快视觉上的开机时间
-    app_contorller->main_process(&mpu.action_info);
+    /* // 优先显示屏幕 加快视觉上的开机时间
+    app_contorller->main_process(&mpu.action_info); */
 
     /*** Init IMU as input device ***/
     lv_port_indev_init();
@@ -72,8 +72,13 @@ void setup()
                             255, 255, 255,
                             1, 1, 1,
                             0.15, 0.25, 0.001, 30};
+
     // 初始化RGB任务
     rgb_thread_init(&rgb_setting);
+    
+    // 在初始化之后显示屏幕
+    app_contorller->main_process(&mpu.action_info);
+    
 }
 
 void loop()
