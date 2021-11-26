@@ -129,7 +129,7 @@ Imu_Action *IMU::update(int interval)
             {
                 action_info.isValid = 1;
                 action_info.active = UP;
-                delay(500);
+                //delay(500);
                 mpu.getMotion6(&(action_info.ax), &(action_info.ay), &(action_info.az),
                                &(action_info.gx), &(action_info.gy), &(action_info.gz));
                 if (action_info.ax > 5000)
@@ -143,7 +143,7 @@ Imu_Action *IMU::update(int interval)
             {
                 action_info.isValid = 1;
                 action_info.active = DOWN;
-                delay(500);
+                //delay(500);
                 mpu.getMotion6(&(action_info.ax), &(action_info.ay), &(action_info.az),
                                &(action_info.gx), &(action_info.gy), &(action_info.gz));
                 if (action_info.ax < -5000)
