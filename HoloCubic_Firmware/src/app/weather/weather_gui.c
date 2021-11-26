@@ -179,7 +179,7 @@ void display_weather_init(lv_scr_load_anim_t anim_type)
     lv_img_set_zoom(tempImg, 180);
     tempBar = lv_bar_create(scr_1, NULL);
     lv_obj_add_style(tempBar, LV_BAR_TYPE_NORMAL, &bar_style);
-    lv_bar_set_range(tempBar, 0, 40);
+    lv_bar_set_range(tempBar, -20, 40);//修改下限
     lv_obj_set_size(tempBar, 60, 12);
     lv_obj_set_style_local_bg_color(tempBar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, LV_COLOR_RED);
     lv_bar_set_value(tempBar, 10, LV_ANIM_OFF);
@@ -199,7 +199,7 @@ void display_weather_init(lv_scr_load_anim_t anim_type)
     humiLabel = lv_label_create(scr_1, NULL);
     lv_obj_add_style(humiLabel, LV_LABEL_PART_MAIN, &chFont_style);
     //修复湿度固定显示
-    lv_label_set_text_fmt(humiLabel, "%2d%",50);
+    lv_label_set_text_fmt(humiLabel, "%2d%%",50);
 
     // 太空人图标
     spaceImg = lv_img_create(scr_1, NULL);
