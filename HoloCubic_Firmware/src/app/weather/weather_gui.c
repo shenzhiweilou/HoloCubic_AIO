@@ -1,5 +1,6 @@
 #include "weather_gui.h"
 #include "weather_image.h"
+#include "stdio.h"
 
 #include "lvgl.h"
 
@@ -29,9 +30,12 @@ static lv_obj_t *spaceImg = NULL;
 
 static lv_chart_series_t *ser1, *ser2;
 
-// 天气图标路径的映射关系
-const void *weaImage_map[] = {&weather_0, &weather_9, &weather_14, &weather_5, &weather_25,
-                              &weather_30, &weather_26, &weather_11, &weather_23};
+// 天气图标路径的映射关系(已修改为从SD卡读取)
+/* const void *weaImage_map[] = {&weather_0, &weather_9, &weather_14, &weather_5, &weather_25,
+                              &weather_30, &weather_26, &weather_11, &weather_23}; */
+const void *weaImage_map[] = {"S:/weather/1.bin","S:/weather/2.bin","S:/weather/3.bin","S:/weather/4.bin","S:/weather/5.bin","S:/weather/6.bin",
+                            "S:/weather/7.bin","S:/weather/8.bin","S:/weather/9.bin"};
+
 // 太空人图标路径的映射关系
 const void *manImage_map[] = {&man_0, &man_1, &man_2, &man_3, &man_4, &man_5, &man_6, &man_7, &man_8, &man_9};
 static const char weekDayCh[7][4] = {"日", "一", "二", "三", "四", "五", "六"};
@@ -87,13 +91,13 @@ void display_curve_init(lv_scr_load_anim_t anim_type)
 
     chart = lv_chart_create(scr_2, NULL);
     lv_obj_set_size(chart, 220, 180);
-    lv_chart_set_range(chart, 0, 40);
+    lv_chart_set_range(chart, -20, 40);//修改下限为-20
     lv_chart_set_point_count(chart, 7);
     lv_chart_set_type(chart, LV_CHART_TYPE_LINE); /*Show lines and points too*/
     ser1 = lv_chart_add_series(chart, LV_COLOR_RED);
     ser2 = lv_chart_add_series(chart, LV_COLOR_BLUE);
     lv_obj_set_style_local_pad_left(chart, LV_CHART_PART_BG, LV_STATE_DEFAULT, 40);
-    lv_chart_set_y_tick_texts(chart, "40\n30\n20\n10\n0", 0, LV_CHART_AXIS_DRAW_LAST_TICK);
+    lv_chart_set_y_tick_texts(chart, "40\n30\n20\n10\n0\n-10\n-20", 0, LV_CHART_AXIS_DRAW_LAST_TICK);//修改下限为-20
     
     // 绘制
     lv_obj_align(titleLabel, NULL, LV_ALIGN_IN_TOP_MID, 0, 10);
