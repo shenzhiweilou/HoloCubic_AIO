@@ -151,6 +151,9 @@ void media_player_process(AppController *sys,
 
         // 创建播放
         video_start(true);
+
+        //换新视频后短暂延迟
+        delay(800);
     }
 
     if (NULL == run_data->pfile)

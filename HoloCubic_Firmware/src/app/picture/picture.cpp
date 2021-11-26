@@ -135,8 +135,9 @@ void picture_process(AppController *sys,
             // 使用LVGL的bin格式的图片
             display_photo(file_name, anim_type);
         }
+        //换下一张图片后短暂延迟
+        delay(800);
     }
-    delay(300);
 }
 
 void picture_exit_callback(void)
