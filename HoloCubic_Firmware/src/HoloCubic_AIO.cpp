@@ -30,10 +30,14 @@ AppController *app_contorller; // APP控制器
 
 void setup()
 {
+
     Serial.begin(115200);
 
-    Serial.println(F("\nAIO (All in one) version "AIO_VERSION"\n"));
+    Serial.println(F("\nVersion："AIO_VERSION"\n"));
     
+    //WiFi上电，提前触发断电保护
+    WiFi.enableSTA(true);
+
     config_read(NULL, &g_cfg);
 
     /*** Init screen ***/
@@ -75,7 +79,7 @@ void setup()
 
     // 初始化RGB任务
     rgb_thread_init(&rgb_setting);
-    
+
     // 在初始化之后显示屏幕
     app_contorller->main_process(&mpu.action_info);
     
