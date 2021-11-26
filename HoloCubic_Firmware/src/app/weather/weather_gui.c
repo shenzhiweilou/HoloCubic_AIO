@@ -1,6 +1,5 @@
 #include "weather_gui.h"
 #include "weather_image.h"
-#include "stdio.h"
 
 #include "lvgl.h"
 
@@ -199,7 +198,8 @@ void display_weather_init(lv_scr_load_anim_t anim_type)
     lv_bar_set_value(humiBar, 49, LV_ANIM_OFF);
     humiLabel = lv_label_create(scr_1, NULL);
     lv_obj_add_style(humiLabel, LV_LABEL_PART_MAIN, &chFont_style);
-    lv_label_set_text(humiLabel, "49%");
+    //修复湿度固定显示
+    lv_label_set_text_fmt(humiLabel, "%2d%",50);
 
     // 太空人图标
     spaceImg = lv_img_create(scr_1, NULL);
@@ -242,6 +242,9 @@ void display_weather(struct Weather weaInfo, lv_scr_load_anim_t anim_type)
     lv_bar_set_value(tempBar, weaInfo.temperature, LV_ANIM_OFF);
     lv_label_set_text_fmt(tempLabel, "%2d°C", weaInfo.temperature);
     lv_img_set_src(weatherImg, weaImage_map[weaInfo.weather_code]);
+
+    //修复湿度固定显示
+    lv_label_set_text_fmt(humiLabel, "%2d%%",weaInfo.humidity);
 
     // // 绘制图形
     // lv_obj_align(weatherImg, NULL, LV_ALIGN_IN_TOP_RIGHT, -10, 10);
