@@ -1,5 +1,6 @@
 #include "app_contorller_gui.h"
 // #include "lvgl.h"
+LV_FONT_DECLARE(app_controller_font)
 
 // 必须定义为全局或者静态
 static lv_obj_t *app_scr = NULL;
@@ -13,7 +14,6 @@ const void *pre_img_path = NULL;
 static lv_style_t default_style;
 static lv_style_t app_name_style;
 
-LV_FONT_DECLARE(lv_font_montserrat_24);
 
 void app_control_gui_init(void)
 {
@@ -32,7 +32,7 @@ void app_control_gui_init(void)
     lv_style_init(&app_name_style);
     lv_style_set_text_opa(&app_name_style, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_text_color(&app_name_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-    lv_style_set_text_font(&app_name_style, LV_STATE_DEFAULT, &lv_font_montserrat_24);
+    lv_style_set_text_font(&app_name_style, LV_STATE_DEFAULT, &app_controller_font);
 
     // APP图标页
     app_scr = lv_obj_create(NULL, NULL);

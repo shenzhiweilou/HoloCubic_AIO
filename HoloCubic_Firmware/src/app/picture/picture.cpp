@@ -157,6 +157,6 @@ void picture_event_notification(APP_EVENT event, int event_id)
 {
 }
 
-APP_OBJ picture_app = {"Picture", &app_picture, "", picture_init,
+APP_OBJ picture_app = {"相册", &app_picture, "", picture_init,
                        picture_process, picture_exit_callback,
                        picture_event_notification};

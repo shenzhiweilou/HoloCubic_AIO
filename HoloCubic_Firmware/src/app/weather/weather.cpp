@@ -316,6 +316,6 @@ static void weather_event_notification(APP_EVENT event, int event_id)
     }
 }
 
-APP_OBJ weather_app = {"Weather", &app_weather, "", weather_init,
+APP_OBJ weather_app = {"天气", &app_weather, "", weather_init,
                        weather_process, weather_exit_callback,
                        weather_event_notification};
