@@ -37,6 +37,7 @@ void setup()
     
     //WiFi上电，提前触发断电保护
     WiFi.enableSTA(true);
+    WiFi.enableSTA(false);
 
     config_read(NULL, &g_cfg);
 
