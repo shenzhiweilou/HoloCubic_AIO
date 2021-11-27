@@ -27,6 +27,13 @@ struct TimeStr
     int weekday;
 };
 
+struct Tips
+{
+    char msg[100];
+    char date[100];
+    int time;
+};
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -44,8 +51,8 @@ extern "C"
     void display_weather_init(lv_scr_load_anim_t anim_type);
     void display_weather(struct Weather weaInfo, lv_scr_load_anim_t anim_type);
     void display_time(struct TimeStr timeInfo, lv_scr_load_anim_t anim_type);
+    void display_tips(bool connected, struct Tips *tips);
     void weather_gui_del(void);
-    void display_space(void);
     int airQulityLevel(int q);
 
 #ifdef __cplusplus

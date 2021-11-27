@@ -5,7 +5,7 @@
 
 LV_FONT_DECLARE(lv_font_ibmplex_115);
 LV_FONT_DECLARE(lv_font_ibmplex_64);
-LV_FONT_DECLARE(ch_font20);
+LV_FONT_DECLARE(weather_font_20);
 static lv_style_t default_style;
 static lv_style_t chFont_style;
 static lv_style_t numberSmall_style;
@@ -25,18 +25,15 @@ static lv_obj_t *clockLabel_1 = NULL, *clockLabel_2 = NULL;
 static lv_obj_t *dateLabel = NULL;
 static lv_obj_t *tempImg = NULL, *tempBar = NULL, *tempLabel = NULL;
 static lv_obj_t *humiImg = NULL, *humiBar = NULL, *humiLabel = NULL;
-static lv_obj_t *spaceImg = NULL;
+
+static lv_obj_t *tip1 = NULL, *tip2 = NULL, *tip3 = NULL;
 
 static lv_chart_series_t *ser1, *ser2;
 
 // 天气图标路径的映射关系(已修改为从SD卡读取)
-/* const void *weaImage_map[] = {&weather_0, &weather_9, &weather_14, &weather_5, &weather_25,
-                              &weather_30, &weather_26, &weather_11, &weather_23}; */
 const void *weaImage_map[] = {"S:/weather/1.bin","S:/weather/2.bin","S:/weather/3.bin","S:/weather/4.bin","S:/weather/5.bin","S:/weather/6.bin",
                             "S:/weather/7.bin","S:/weather/8.bin","S:/weather/9.bin"};
 
-// 太空人图标路径的映射关系
-const void *manImage_map[] = {&man_0, &man_1, &man_2, &man_3, &man_4, &man_5, &man_6, &man_7, &man_8, &man_9};
 static const char weekDayCh[7][4] = {"日", "一", "二", "三", "四", "五", "六"};
 static const char airQualityCh[6][10] = {"优", "良", "轻度", "中度", "重度", "严重"};
 
@@ -51,7 +48,7 @@ void weather_gui_init(void)
     lv_style_init(&chFont_style);
     lv_style_set_text_opa(&chFont_style, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_text_color(&chFont_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
-    lv_style_set_text_font(&chFont_style, LV_STATE_DEFAULT, &ch_font20);
+    lv_style_set_text_font(&chFont_style, LV_STATE_DEFAULT, &weather_font_20);
     lv_style_init(&numberSmall_style);
     lv_style_set_text_opa(&numberSmall_style, LV_STATE_DEFAULT, LV_OPA_COVER);
     lv_style_set_text_color(&numberSmall_style, LV_STATE_DEFAULT, LV_COLOR_WHITE);
@@ -164,7 +161,7 @@ void display_weather_init(lv_scr_load_anim_t anim_type)
     clockLabel_1 = lv_label_create(scr_1, NULL);
     lv_obj_add_style(clockLabel_1, LV_LABEL_PART_MAIN, &numberBig_style);
     lv_label_set_recolor(clockLabel_1, true);
-    lv_label_set_text_fmt(clockLabel_1, "%02d#ffa500 %02d#", 10, 52);
+    lv_label_set_text_fmt(clockLabel_1, "%02d#ffa500 %02d#", 00, 00);//改变默认显示
     clockLabel_2 = lv_label_create(scr_1, NULL);
     lv_obj_add_style(clockLabel_2, LV_LABEL_PART_MAIN, &numberSmall_style);
     lv_label_set_recolor(clockLabel_2, true);
@@ -172,7 +169,7 @@ void display_weather_init(lv_scr_load_anim_t anim_type)
 
     dateLabel = lv_label_create(scr_1, NULL);
     lv_obj_add_style(dateLabel, LV_LABEL_PART_MAIN, &chFont_style);
-    lv_label_set_text_fmt(dateLabel, "%2d月%2d日   周%s", 11, 23, weekDayCh[1]);
+    lv_label_set_text_fmt(dateLabel, "%2d月%2d日   周%s", 1, 1, weekDayCh[1]);//改变默认显示
 
     tempImg = lv_img_create(scr_1, NULL);
     lv_img_set_src(tempImg, &temp);
@@ -195,18 +192,34 @@ void display_weather_init(lv_scr_load_anim_t anim_type)
     lv_bar_set_range(humiBar, 0, 100);
     lv_obj_set_size(humiBar, 60, 12);
     lv_obj_set_style_local_bg_color(humiBar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, LV_COLOR_BLUE);
-    lv_bar_set_value(humiBar, 49, LV_ANIM_OFF);
+    lv_bar_set_value(humiBar, 50, LV_ANIM_OFF);
     humiLabel = lv_label_create(scr_1, NULL);
     lv_obj_add_style(humiLabel, LV_LABEL_PART_MAIN, &chFont_style);
     //修复湿度固定显示
     lv_label_set_text_fmt(humiLabel, "%2d%%",50);
 
-    // 太空人图标
-    spaceImg = lv_img_create(scr_1, NULL);
-    lv_img_set_src(spaceImg, manImage_map[0]);
+    //提示信息
+    tip1 = lv_label_create(scr_1, NULL);
+    lv_obj_add_style(tip1, LV_LABEL_PART_MAIN, &chFont_style);
+    lv_label_set_text(tip1, "初始化中");
+    lv_label_set_long_mode(tip1, LV_LABEL_LONG_SROLL_CIRC);
+    lv_label_set_text(tip1, "暂时没有新消息  ");
+
+    tip2 = lv_label_create(scr_1, NULL);
+    lv_obj_add_style(tip2, LV_LABEL_PART_MAIN, &chFont_style);
+    lv_label_set_text(tip2, "初始化中");
+    lv_label_set_long_mode(tip2, LV_LABEL_LONG_SROLL_CIRC);
+    lv_label_set_text(tip2, "暂时没有新消息  ");
+
+    tip3 = lv_label_create(scr_1, NULL);
+    lv_obj_add_style(tip3, LV_LABEL_PART_MAIN, &chFont_style);
+    lv_label_set_text(tip3, "初始化中");
+    lv_label_set_long_mode(tip3, LV_LABEL_LONG_SROLL);
+    lv_label_set_recolor(tip3, true); 
+
 
     // 绘制图形
-    lv_obj_align(weatherImg, NULL, LV_ALIGN_IN_TOP_RIGHT, -10, 10);
+    lv_obj_align(weatherImg, NULL, LV_ALIGN_IN_TOP_RIGHT, 0, -10);// 使天气图标更靠近角落
     lv_obj_align(cityLabel, NULL, LV_ALIGN_IN_TOP_LEFT, 20, 15);
     lv_obj_align(txtLabel, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 50);
     lv_obj_align(tempImg, NULL, LV_ALIGN_IN_LEFT_MID, 10, 70);
@@ -215,7 +228,11 @@ void display_weather_init(lv_scr_load_anim_t anim_type)
     lv_obj_align(humiImg, NULL, LV_ALIGN_IN_LEFT_MID, 0, 100);
     lv_obj_align(humiBar, NULL, LV_ALIGN_IN_LEFT_MID, 35, 100);
     lv_obj_align(humiLabel, NULL, LV_ALIGN_IN_LEFT_MID, 100, 100);
-    lv_obj_align(spaceImg, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, -10, -10);
+    // lv_obj_align(spaceImg, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, -10, -10);
+
+    lv_obj_align(tip1, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, -8, -68);
+    lv_obj_align(tip2, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, -8, -38);
+    lv_obj_align(tip3, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, -8, -8);
 
     lv_obj_align(clockLabel_1, NULL, LV_ALIGN_IN_LEFT_MID, 0, 10);
     lv_obj_align(clockLabel_2, NULL, LV_ALIGN_IN_LEFT_MID, 165, 9);
@@ -245,6 +262,7 @@ void display_weather(struct Weather weaInfo, lv_scr_load_anim_t anim_type)
 
     //修复湿度固定显示
     lv_label_set_text_fmt(humiLabel, "%2d%%",weaInfo.humidity);
+    lv_bar_set_value(humiBar, weaInfo.humidity, LV_ANIM_OFF);
 
     // // 绘制图形
     // lv_obj_align(weatherImg, NULL, LV_ALIGN_IN_TOP_RIGHT, -10, 10);
@@ -290,6 +308,21 @@ void display_time(struct TimeStr timeInfo, lv_scr_load_anim_t anim_type)
     // }
 }
 
+void display_tips(bool connected, struct Tips *tips)
+{
+    if (connected == true)
+    {
+        lv_label_set_text(tip3, "网络已连接");
+    }else 
+    {
+        lv_label_set_text(tip3, "#ff0000 网络未连接#");
+    }
+
+    lv_label_set_text(tip1, tips->msg);
+    lv_label_set_text(tip2, tips->date);
+    
+}
+
 void weather_obj_del(void)
 {
     if (weatherImg != NULL)
@@ -308,7 +341,6 @@ void weather_obj_del(void)
         lv_obj_clean(humiImg);
         lv_obj_clean(humiBar);
         lv_obj_clean(humiLabel);
-        lv_obj_clean(spaceImg);
         weatherImg = NULL;
         cityLabel = NULL;
         btn = NULL;
@@ -323,7 +355,6 @@ void weather_obj_del(void)
         humiImg = NULL;
         humiBar = NULL;
         humiLabel = NULL;
-        spaceImg = NULL;
     }
     if (chart != NULL)
     {
@@ -349,16 +380,6 @@ void weather_gui_del(void)
     {
         lv_obj_clean(scr_2);
         scr_2 = NULL;
-    }
-}
-
-void display_space(void)
-{
-    static int _spaceIndex = 0;
-    if (NULL != scr_1 && lv_scr_act() == scr_1)
-    {
-        lv_img_set_src(spaceImg, manImage_map[_spaceIndex]);
-        _spaceIndex = (_spaceIndex + 1) % 10;
     }
 }
 
