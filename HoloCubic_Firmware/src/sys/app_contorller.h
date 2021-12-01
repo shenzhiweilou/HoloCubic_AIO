@@ -13,7 +13,7 @@
 struct EVENT_OBJ
 {
     const APP_OBJ *req; // 发送请求服务的APP
-    APP_EVENT type;     // app的事件类型
+    APP_EVENT_TYPE type;     // app的事件类型
     unsigned int id;    // 发送请求服务的id
 };
 
@@ -28,8 +28,9 @@ public:
     int main_process(Imu_Action *act_info);
     void app_exit(void); // 提供给app退出的系统调用
     // 事件请求
-    int req_event(const APP_OBJ *from, APP_EVENT event, int event_id);
-    int req_event_deal(void); // 事件处理
+    int req_event(const APP_OBJ *from, APP_EVENT_TYPE type, int event_id);
+    int req_event_deal(void);           // 事件处理
+    int wifi_deal(APP_EVENT_TYPE type); // wifi事件的处理
 
 private:
     int app_is_legal(const APP_OBJ *app_obj);
@@ -39,6 +40,7 @@ private:
     // std::list<const APP_OBJ *> app_list; // APP注册位(为了C语言可移植，放弃使用链表)
     std::list<EVENT_OBJ> eventList;     // 用来储存事件
     boolean m_wifi_status;               // 表示是wifi状态 true开启 false关闭
+    boolean m_wifi_ap_status;           // 表示AP的开启状态，区别于m_wifi_status 
     unsigned long m_preWifiReqMillis;    // 保存上一回请求的时间戳
     unsigned int app_num;
     boolean app_exit_flag; // 表示是否退出APP应用

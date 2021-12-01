@@ -5,7 +5,7 @@
 #include "network.h"
 #include "common.h"
 
-#define SERVER_REFLUSH_INTERVAL 2000UL // 配置界面重新刷新时间(2s)
+#define SERVER_REFLUSH_INTERVAL 5000UL // 配置界面重新刷新时间(5s)
 
 WebServer server(80);
 
@@ -84,6 +84,7 @@ void server_process(AppController *sys,
             // "", "",
             LV_SCR_LOAD_ANIM_NONE);
         // 如果web服务没有开启 且 ap开启的请求没有发送 event_id这边没有作用（填0）
+        sys->req_event(&server_app, APP_EVENT_WIFI_CONN, 0);
         sys->req_event(&server_app, APP_EVENT_WIFI_AP, 0);
         run_data->req_sent = 1; // 标志为 ap开启请求已发送
     }
@@ -91,6 +92,7 @@ void server_process(AppController *sys,
     {
         // 发送wifi维持的心跳
         sys->req_event(&server_app, APP_EVENT_WIFI_ALIVE, 0);
+
         server.handleClient(); // 一定需要放在循环里扫描
         if (doDelayMillisTime(SERVER_REFLUSH_INTERVAL, &run_data->serverReflushPreMillis, false) == true)
         {
@@ -112,10 +114,23 @@ void server_exit_callback(void)
     run_data = NULL;
 }
 
-void server_event_notification(APP_EVENT event, int event_id)
+void server_event_notification(APP_EVENT_TYPE type, int event_id)
 {
-    switch (event)
+    switch (type)
     {
+    case APP_EVENT_WIFI_CONN:
+    {
+        Serial.print(F("APP_EVENT_WIFI_CONN enable\n"));
+        display_setting(
+            "WebServer Start",
+            "Domain: holocubic",
+            WiFi.localIP().toString().c_str(),
+            WiFi.softAPIP().toString().c_str(),
+            LV_SCR_LOAD_ANIM_NONE);
+        start_web_config();
+        run_data->web_start = 1;
+    }
+    break;
     case APP_EVENT_WIFI_AP:
     {
         Serial.print(F("APP_EVENT_WIFI_AP enable\n"));

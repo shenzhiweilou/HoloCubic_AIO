@@ -258,6 +258,7 @@ static void weather_process(AppController *sys,
         {
             UpdateTime_RTC(getTimestamp());
         }
+        sys->req_event(&weather_app, APP_EVENT_WIFI_ALIVE, 0);
         run_data->coactusUpdateFlag = 0x00; // 取消强制更新标志
         display_space();
     }
@@ -265,10 +266,8 @@ static void weather_process(AppController *sys,
     {
         // 仅在切换界面时获取一次未来天气
         display_curve(run_data->wea.daily_max, run_data->wea.daily_min, anim_type);
-        delay(300);
+        delay(500);
     }
-
-    delay(30);
 }
 
 static void weather_exit_callback(void)
@@ -279,9 +278,9 @@ static void weather_exit_callback(void)
     run_data = NULL;
 }
 
-static void weather_event_notification(APP_EVENT event, int event_id)
+static void weather_event_notification(APP_EVENT_TYPE type, int event_id)
 {
-    if (event == APP_EVENT_WIFI_CONN)
+    if (type == APP_EVENT_WIFI_CONN)
     {
         Serial.println(F("----->weather_event_notification"));
         switch (event_id)

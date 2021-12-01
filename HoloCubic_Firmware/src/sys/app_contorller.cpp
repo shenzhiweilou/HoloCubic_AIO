@@ -12,6 +12,7 @@ AppController::AppController()
     pre_app_index = 0;
     // appList = new APP_OBJ[APP_MAX_NUM];
     m_wifi_status = false;
+    m_wifi_ap_status = false;
     m_preWifiReqMillis = millis();
     // 设置CPU主频
     setCpuFrequencyMhz(80);
@@ -128,33 +129,36 @@ int AppController::main_process(Imu_Action *act_info)
 }
 
 // 事件请求
-int AppController::req_event(const APP_OBJ *from, APP_EVENT event, int event_id)
+int AppController::req_event(const APP_OBJ *from, APP_EVENT_TYPE type, int event_id)
 {
     // 更新事件的请求者
-    if(eventList.size() > EVENT_LIST_MAX_LENGTH)
+    if (eventList.size() > EVENT_LIST_MAX_LENGTH)
     {
         return 1;
     }
-    EVENT_OBJ new_event = {from, event, event_id};
+    EVENT_OBJ new_event = {from, type, event_id};
     eventList.push_back(new_event);
+    return 0;
+}
 
-    switch (event)
+int AppController::wifi_deal(APP_EVENT_TYPE type)
+{
+    switch (type)
     {
     case APP_EVENT_WIFI_CONN:
     {
         // 更新请求
-        m_preWifiReqMillis = millis();
-        /*** Read WiFi info in SD-Card, then scan & connect WiFi ***/
         g_network.start_conn_wifi(g_cfg.ssid.c_str(), g_cfg.password.c_str());
         m_wifi_status = true;
+        m_preWifiReqMillis = millis();
     }
     break;
     case APP_EVENT_WIFI_AP:
     {
         // 更新请求
-        m_preWifiReqMillis = millis();
         g_network.open_ap(AP_SSID);
-        m_wifi_status = true;
+        m_wifi_ap_status = true;
+        m_preWifiReqMillis = millis();
     }
     break;
     case APP_EVENT_WIFI_ALIVE:
@@ -169,6 +173,8 @@ int AppController::req_event(const APP_OBJ *from, APP_EVENT event, int event_id)
     {
         g_network.close_wifi();
         m_wifi_status = false; // 标志位
+        m_wifi_ap_status = false;
+        m_preWifiReqMillis = millis()-WIFI_LIFE_CYCLE;
     }
     break;
     case APP_EVENT_UPDATE_TIME:
@@ -178,36 +184,57 @@ int AppController::req_event(const APP_OBJ *from, APP_EVENT event, int event_id)
     default:
         break;
     }
+
     return 0;
 }
 
 int AppController::req_event_deal(void)
 {
+    // 请求事件的处理
     for (std::list<EVENT_OBJ>::iterator event = eventList.begin(); event != eventList.end(); ++event)
     {
         // wifi事件
-        if (false == m_wifi_status)
+        if (false == m_wifi_status && (*event).type == APP_EVENT_WIFI_CONN)
         {
-            return 0;
+            wifi_deal((*event).type);
+            continue;
         }
+
+        if(false == m_wifi_ap_status && (*event).type == APP_EVENT_WIFI_AP)
+        {
+            wifi_deal((*event).type);
+            continue;
+        }
+
+        if((*event).type == APP_EVENT_WIFI_ALIVE)
+        {
+            wifi_deal((*event).type);
+            continue;
+        }
+
         if (millis() - m_preWifiReqMillis > WIFI_LIFE_CYCLE)
         {
             g_network.close_wifi();
             m_wifi_status = false; // 标志位
-            return true;
+            continue;
         }
 
-        if (NULL == (*event).req || APP_EVENT_WIFI_ALIVE <= (*event).type)
-            continue;
+        // if (NULL == (*event).req || APP_EVENT_WIFI_ALIVE <= (*event).type)
+        // {
+        //     Serial.print(F("++++++++>\n"));
+        //     continue;
+        // }
 
         if ((WiFi.getMode() & WIFI_MODE_STA) == WIFI_MODE_STA && CONN_SUCC != g_network.end_conn_wifi())
         {
             // 在STA模式下 并且还没连接上wifi
             continue;
         }
+
         // 事件回调
         (*(appList[cur_app_index]->on_event))((*event).type, (*event).id);
-        eventList.erase(event); // 删除该响应完成的事件
+        eventList.erase(event); // 删除该响应事件
+        //Serial.print(F("Add APP_EVENT_WIFI_ALIVE\n"));
     }
     return 0;
 }
@@ -215,6 +242,8 @@ int AppController::req_event_deal(void)
 void AppController::app_exit()
 {
     app_exit_flag = 0; // 退出APP
+
+    wifi_deal(APP_EVENT_WIFI_DISCONN);
 
     // 清空该对象的所有请求
     for (std::list<EVENT_OBJ>::iterator event = eventList.begin(); event != eventList.end(); ++event)
