@@ -47,21 +47,20 @@ String file_size(int bytes)
 // "<label class=\"input\"><span>AutoCalibrationMPU status (0关闭 1开启)</span><input type=\"text\"name=\"auto_calibration_mpu\"value=\"%u\"></label>"
 #define SETING_CSS ".input {display: block;margin-top: 10px;}"                                          \
                    ".input span {width: 200px;float: left;float: left;height: 36px;line-height: 36px;}" \
-                   ".input input {height: 30px;width: 200px;}"                                          \
+                   ".input input {height: 30px;width: 300px;}"                                          \
                    ".input .radio {height: 30px;width: 50px;}"                                          \
                    ".btn {width: 120px;height: 35px;background-color: #000000;border: 0px;color: #ffffff;margin-top: 15px;margin-left: auto;}" // margin-left: 100px;
 
 #define SETTING "<form method=\"GET\" action=\"saveConf\">"                                                                                                                                                                                                        \
-                "<label class=\"input\"><span>WiFi SSID (2.4G)</span><input type=\"text\"name=\"ssid\"value=\"%s\"></label>"                                                                                                                                       \
-                "<label class=\"input\"><span>WiFi Passwd</span><input type=\"text\"name=\"pass\"value=\"%s\"></label>"                                                                                                                                            \
-                "<label class=\"input\"><span>City Name</span><input type=\"text\"name=\"cityname\"value=\"%s\"></label>"                                                                                                                                          \
-                "<label class=\"input\"><span>City Language(zh-Hans)</span><input type=\"text\"name=\"language\"value=\"%s\"></label>"                                                                                                                             \
-                "<label class=\"input\"><span>Weather Key</span><input type=\"text\"name=\"weatherKey\"value=\"%s\"></label>"                                                                                                                                         \
-                "<label class=\"input\"><span>TianQi AppId</span><input type=\"text\"name=\"tianqiAppId\"value=\"%s\"></label>"                                                                                                                                        \
-                "<label class=\"input\"><span>TianQi AppSecret</span><input type=\"text\"name=\"tianqiAppSecret\"value=\"%s\"></label>"                                                                                                                                     \
-                "<label class=\"input\"><span>BackLight (值为1~100)</span><input type=\"text\"name=\"backLight\"value=\"%u\"></label>"                                                                                                                           \
-                "<label class=\"input\"><span>Rotation value (0~5可选)</span><input type=\"text\"name=\"rotation\"value=\"%u\"></label>"                                                                                                                         \
-                "<label class=\"input\"><span>AutoCalibrationMPU</span><input class=\"radio\" type=\"radio\" value=\"0\" name=\"auto_calibration_mpu\" %s>关闭<input class=\"radio\" type=\"radio\" value=\"1\" name=\"auto_calibration_mpu\" %s>开启</label>" \
+                "<label class=\"input\"><span>WiFi 名称（2.4GHz）</span><input type=\"text\"name=\"ssid\"value=\"%s\"></label>"                                                                                                                                       \
+                "<label class=\"input\"><span>WiFi 密码</span><input type=\"text\"name=\"pass\"value=\"%s\"></label>"                                                                                                                                            \
+                "<label class=\"input\"><span>城市名称（拼音）</span><input type=\"text\"name=\"cityname\"value=\"%s\"></label>"                                                                                                                                          \
+                "<label class=\"input\"><span>城市语言（默认：zh-Hans）</span><input type=\"text\"name=\"language\"value=\"%s\"></label>"                                                                                                                             \
+                "<label class=\"input\"><span>天气API AppId（保持默认）</span><input type=\"text\"name=\"tianqiAppId\"value=\"%s\"></label>"                                                                                                                                        \
+                "<label class=\"input\"><span>天气API AppSecret（保持默认）</span><input type=\"text\"name=\"tianqiAppSecret\"value=\"%s\"></label>"                                                                                                                                     \
+                "<label class=\"input\"><span>屏幕亮度 （值为1~100）</span><input type=\"text\"name=\"backLight\"value=\"%u\"></label>"                                                                                                                           \
+                "<label class=\"input\"><span>屏幕方向 （勿动！0~5可选）</span><input type=\"text\"name=\"rotation\"value=\"%u\"></label>"                                                                                                                         \
+                "<label class=\"input\"><span>开机自动校准传感器</span><input class=\"radio\" type=\"radio\" value=\"0\" name=\"auto_calibration_mpu\" %s>关闭<input class=\"radio\" type=\"radio\" value=\"1\" name=\"auto_calibration_mpu\" %s>开启</label>" \
                 "</label><input class=\"btn\" type=\"submit\" name=\"submit\" value=\"Submie\"></form>"
 
 void init_page_header()
@@ -131,20 +130,20 @@ void Setting()
 {
     // 实时读取配置文件
     // config_read("/wifi.txt", &g_cfg);
-    char buf[1536];
+    char buf[2048];
     // 主要为了处理启停MPU自动校准的单选框
     if (0 == g_cfg.auto_calibration_mpu)
     {
         sprintf(buf, SETTING, g_cfg.ssid.c_str(), g_cfg.password.c_str(),
                 g_cfg.cityname.c_str(), g_cfg.language.c_str(),
-                g_cfg.weather_key.c_str(), g_cfg.tianqi_appid.c_str(), g_cfg.tianqi_appsecret.c_str(), 
+                g_cfg.tianqi_appid.c_str(), g_cfg.tianqi_appsecret.c_str(), 
                 g_cfg.backLight, g_cfg.rotation,  "checked=\"checked\"", "");
     }
     else
     {
         sprintf(buf, SETTING, g_cfg.ssid.c_str(), g_cfg.password.c_str(),
                 g_cfg.cityname.c_str(), g_cfg.language.c_str(),
-                g_cfg.weather_key.c_str(), g_cfg.tianqi_appid.c_str(), g_cfg.tianqi_appsecret.c_str(), 
+                g_cfg.tianqi_appid.c_str(), g_cfg.tianqi_appsecret.c_str(), 
                 g_cfg.backLight, g_cfg.rotation, "", "checked=\"checked\"");
     }
     webpage = buf;
@@ -160,7 +159,6 @@ void save_config(void)
     g_cfg.password = server.arg("pass");
     g_cfg.cityname = server.arg("cityname");
     g_cfg.language = server.arg("language");
-    g_cfg.weather_key = server.arg("weatherKey");
     g_cfg.tianqi_appid = server.arg("tianqiAppId");
     g_cfg.tianqi_appsecret = server.arg("tianqiAppSecret");
     g_cfg.backLight = server.arg("backLight").toInt();

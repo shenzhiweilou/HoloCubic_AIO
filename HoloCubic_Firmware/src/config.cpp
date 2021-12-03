@@ -17,7 +17,6 @@ void config_read(const char *file_path, Config *cfg)
     cfg->cityname = prefs.getString("cityname", "BeiJing");
     // cfg->cityname = prefs.getString("cityname", "北京");
     cfg->language = prefs.getString("language", "zh-Hans");
-    cfg->weather_key = prefs.getString("weather_key", "");
     cfg->tianqi_appid = prefs.getString("tianqi_aid", "");
     cfg->tianqi_appsecret = prefs.getString("tianqi_as", "");
     cfg->backLight = prefs.getUChar("backLight", 80);
@@ -46,7 +45,6 @@ void config_save(const char *file_path, Config *cfg)
     prefs.putString("password", cfg->password);
     prefs.putString("cityname", cfg->cityname);
     prefs.putString("language", cfg->language);
-    prefs.putString("weather_key", cfg->weather_key);
     prefs.putString("tianqi_aid", cfg->tianqi_appid);
     prefs.putString("tianqi_as", cfg->tianqi_appsecret);
     prefs.putUChar("backLight", cfg->backLight);
