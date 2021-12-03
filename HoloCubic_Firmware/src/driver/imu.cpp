@@ -41,8 +41,8 @@ void IMU::init()
     {
         // 启动自动校准
         // 7次循环自动校正
-        mpu.CalibrateAccel(7);
-        mpu.CalibrateGyro(7);
+        mpu.CalibrateAccel(3);
+        mpu.CalibrateGyro(3);
         mpu.PrintActiveOffsets();
 
         g_cfg.mpu_config.x_gyro_offset = mpu.getXGyroOffset();
