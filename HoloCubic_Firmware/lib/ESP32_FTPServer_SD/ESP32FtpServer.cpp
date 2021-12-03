@@ -264,8 +264,13 @@ boolean FtpServer::processCommand()
     if( strcmp( parameters, "." ) == 0 )  // 'CWD .' is the same as PWD command
       client.println( "257 \"" + String(cwdName) + "\" is your current directory");
     else 
-      {      
+      {
 
+        if( strcmp( parameters, ".." ) == 0 )
+        {
+          strcpy(parameters, "/");
+        }
+          
         #ifdef FTP_DEBUG
         Serial.print("CWD P=");
         Serial.print(parameters);
