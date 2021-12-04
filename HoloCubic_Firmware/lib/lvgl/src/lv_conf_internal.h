@@ -10,12 +10,6 @@
 
 #include <stdint.h>
 
-/* Add ESP-IDF related includes */
-#if defined (ESP_PLATFORM)
-#  include "sdkconfig.h"
-#  include "esp_attr.h"
-#endif
-
 /* Handle special Kconfig options */
 #include "lv_conf_kconfig.h"
 
@@ -41,9 +35,9 @@
 #    undef __LV_TO_STR_AUX
 #    undef __LV_TO_STR
 #  elif defined(LV_CONF_INCLUDE_SIMPLE)        /*Or simply include lv_conf.h is enabled*/
-#    include "../lv_conf.h"
+#    include "lv_conf.h"
 #  else
-#    include "../lv_conf.h"              /*Else assume lv_conf.h is next to the lvgl folder */
+#    include "../../lv_conf.h"                 /*Else assume lv_conf.h is next to the lvgl folder */
 #  endif
 #endif
 
@@ -55,7 +49,7 @@
    Graphical settings
  *====================*/
 
- /* Maximal horizontal and vertical resolution to support by the library.*/
+/* Maximal horizontal and vertical resolution to support by the library.*/
 #ifndef LV_HOR_RES_MAX
 #  ifdef CONFIG_LV_HOR_RES_MAX
 #    define LV_HOR_RES_MAX CONFIG_LV_HOR_RES_MAX
@@ -85,8 +79,8 @@
 #  endif
 #endif
 
- /* Swap the 2 bytes of RGB565 color.
-  * Useful if the display has a 8 bit interface (e.g. SPI)*/
+/* Swap the 2 bytes of RGB565 color.
+ * Useful if the display has a 8 bit interface (e.g. SPI)*/
 #ifndef LV_COLOR_16_SWAP
 #  ifdef CONFIG_LV_COLOR_16_SWAP
 #    define LV_COLOR_16_SWAP CONFIG_LV_COLOR_16_SWAP
@@ -95,9 +89,9 @@
 #  endif
 #endif
 
-  /* 1: Enable screen transparency.
-   * Useful for OSD or other overlapping GUIs.
-   * Requires `LV_COLOR_DEPTH = 32` colors and the screen's style should be modified: `style.body.opa = ...`*/
+/* 1: Enable screen transparency.
+ * Useful for OSD or other overlapping GUIs.
+ * Requires `LV_COLOR_DEPTH = 32` colors and the screen's style should be modified: `style.body.opa = ...`*/
 #ifndef LV_COLOR_SCREEN_TRANSP
 #  ifdef CONFIG_LV_COLOR_SCREEN_TRANSP
 #    define LV_COLOR_SCREEN_TRANSP CONFIG_LV_COLOR_SCREEN_TRANSP
@@ -106,7 +100,7 @@
 #  endif
 #endif
 
-   /*Images pixels with this color will not be drawn (with chroma keying)*/
+/*Images pixels with this color will not be drawn (with chroma keying)*/
 #ifndef LV_COLOR_TRANSP
 #  ifdef CONFIG_LV_COLOR_TRANSP
 #    define LV_COLOR_TRANSP CONFIG_LV_COLOR_TRANSP
@@ -134,9 +128,9 @@
 #  endif
 #endif
 
- /* Dot Per Inch: used to initialize default sizes.
-  * E.g. a button with width = LV_DPI / 2 -> half inch wide
-  * (Not so important, you can adjust it to modify default sizes and spaces)*/
+/* Dot Per Inch: used to initialize default sizes.
+ * E.g. a button with width = LV_DPI / 2 -> half inch wide
+ * (Not so important, you can adjust it to modify default sizes and spaces)*/
 #ifndef LV_DPI
 #  ifdef CONFIG_LV_DPI
 #    define LV_DPI CONFIG_LV_DPI
@@ -145,13 +139,13 @@
 #  endif
 #endif
 
-  /* The the real width of the display changes some default values:
-   * default object sizes, layout of examples, etc.
-   * According to the width of the display (hor. res. / dpi)
-   * the displays fall in 4 categories.
-   * The 4th is extra large which has no upper limit so not listed here
-   * The upper limit of the categories are set below in 0.1 inch unit.
-   */
+/* The the real width of the display changes some default values:
+ * default object sizes, layout of examples, etc.
+ * According to the width of the display (hor. res. / dpi)
+ * the displays fall in 4 categories.
+ * The 4th is extra large which has no upper limit so not listed here
+ * The upper limit of the categories are set below in 0.1 inch unit.
+ */
 #ifndef LV_DISP_SMALL_LIMIT
 #  ifdef CONFIG_LV_DISP_SMALL_LIMIT
 #    define LV_DISP_SMALL_LIMIT CONFIG_LV_DISP_SMALL_LIMIT
@@ -174,16 +168,25 @@
 #  endif
 #endif
 
-   /* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
+/* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
 
-   /*=========================
-      Memory manager settings
-    *=========================*/
+/* Maximum buffer size to allocate for rotation. Only used if software rotation is enabled. */
+#ifndef LV_DISP_ROT_MAX_BUF
+#  ifdef CONFIG_LV_DISP_ROT_MAX_BUF
+#    define LV_DISP_ROT_MAX_BUF CONFIG_LV_DISP_ROT_MAX_BUF
+#  else
+#    define  LV_DISP_ROT_MAX_BUF  (10U * 1024U)
+#  endif
+#endif
 
-    /* LittelvGL's internal memory manager's settings.
-     * The graphical objects and other related data are stored here. */
+/*=========================
+   Memory manager settings
+ *=========================*/
 
-     /* 1: use custom malloc/free, 0: use the built-in `lv_mem_alloc` and `lv_mem_free` */
+/* LittelvGL's internal memory manager's settings.
+ * The graphical objects and other related data are stored here. */
+
+/* 1: use custom malloc/free, 0: use the built-in `lv_mem_alloc` and `lv_mem_free` */
 #ifndef LV_MEM_CUSTOM
 #  ifdef CONFIG_LV_MEM_CUSTOM
 #    define LV_MEM_CUSTOM CONFIG_LV_MEM_CUSTOM
@@ -220,7 +223,7 @@
 #  endif
 #endif
 
- /* Automatically defrag. on free. Defrag. means joining the adjacent free cells. */
+/* Automatically defrag. on free. Defrag. means joining the adjacent free cells. */
 #ifndef LV_MEM_AUTO_DEFRAG
 #  ifdef CONFIG_LV_MEM_AUTO_DEFRAG
 #    define LV_MEM_AUTO_DEFRAG CONFIG_LV_MEM_AUTO_DEFRAG
@@ -262,8 +265,8 @@
 #  endif
 #endif
 
- /* Garbage Collector settings
-  * Used if lvgl is binded to higher level language and the memory is managed by that language */
+/* Garbage Collector settings
+ * Used if lvgl is binded to higher level language and the memory is managed by that language */
 #ifndef LV_ENABLE_GC
 #  ifdef CONFIG_LV_ENABLE_GC
 #    define LV_ENABLE_GC CONFIG_LV_ENABLE_GC
@@ -295,14 +298,14 @@
 #endif
 #endif /* LV_ENABLE_GC */
 
-  /*=======================
-     Input device settings
-   *=======================*/
+/*=======================
+   Input device settings
+ *=======================*/
 
-   /* Input device default settings.
-    * Can be changed in the Input device driver (`lv_indev_drv_t`)*/
+/* Input device default settings.
+ * Can be changed in the Input device driver (`lv_indev_drv_t`)*/
 
-    /* Input device read period in milliseconds */
+/* Input device read period in milliseconds */
 #ifndef LV_INDEV_DEF_READ_PERIOD
 #  ifdef CONFIG_LV_INDEV_DEF_READ_PERIOD
 #    define LV_INDEV_DEF_READ_PERIOD CONFIG_LV_INDEV_DEF_READ_PERIOD
@@ -339,8 +342,8 @@
 #  endif
 #endif
 
- /* Repeated trigger period in long press [ms]
-  * Time between `LV_EVENT_LONG_PRESSED_REPEAT */
+/* Repeated trigger period in long press [ms]
+ * Time between `LV_EVENT_LONG_PRESSED_REPEAT */
 #ifndef LV_INDEV_DEF_LONG_PRESS_REP_TIME
 #  ifdef CONFIG_LV_INDEV_DEF_LONG_PRESS_REP_TIME
 #    define LV_INDEV_DEF_LONG_PRESS_REP_TIME CONFIG_LV_INDEV_DEF_LONG_PRESS_REP_TIME
@@ -349,8 +352,7 @@
 #  endif
 #endif
 
-
-  /* Gesture threshold in pixels */
+/* Gesture threshold in pixels */
 #ifndef LV_INDEV_DEF_GESTURE_LIMIT
 #  ifdef CONFIG_LV_INDEV_DEF_GESTURE_LIMIT
 #    define LV_INDEV_DEF_GESTURE_LIMIT CONFIG_LV_INDEV_DEF_GESTURE_LIMIT
@@ -372,7 +374,7 @@
  * Feature usage
  *==================*/
 
- /*1: Enable the Animations */
+/*1: Enable the Animations */
 #ifndef LV_USE_ANIMATION
 #  ifdef CONFIG_LV_USE_ANIMATION
 #    define LV_USE_ANIMATION CONFIG_LV_USE_ANIMATION
@@ -408,7 +410,7 @@
 #endif
 #endif
 
- /*1: enable outline drawing on rectangles*/
+/*1: enable outline drawing on rectangles*/
 #ifndef LV_USE_OUTLINE
 #  ifdef CONFIG_LV_USE_OUTLINE
 #    define LV_USE_OUTLINE CONFIG_LV_USE_OUTLINE
@@ -520,7 +522,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
- /*1: Use VG-Lite for CPU offload on NXP RTxxx platforms */
+/*1: Use VG-Lite for CPU offload on NXP RTxxx platforms */
 #ifndef LV_USE_GPU_NXP_VG_LITE
 #  ifdef CONFIG_LV_USE_GPU_NXP_VG_LITE
 #    define LV_USE_GPU_NXP_VG_LITE CONFIG_LV_USE_GPU_NXP_VG_LITE
@@ -579,7 +581,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
  * Image decoder and cache
  *========================*/
 
- /* 1: Enable indexed (palette) images */
+/* 1: Enable indexed (palette) images */
 #ifndef LV_IMG_CF_INDEXED
 #  ifdef CONFIG_LV_IMG_CF_INDEXED
 #    define LV_IMG_CF_INDEXED CONFIG_LV_IMG_CF_INDEXED
@@ -611,13 +613,13 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
- /*Declare the type of the user data of image decoder (can be e.g. `void *`, `int`, `struct`)*/
+/*Declare the type of the user data of image decoder (can be e.g. `void *`, `int`, `struct`)*/
 
- /*=====================
-  *  Compiler settings
-  *====================*/
+/*=====================
+ *  Compiler settings
+ *====================*/
 
-  /* For big endian systems set to 1 */
+/* For big endian systems set to 1 */
 #ifndef LV_BIG_ENDIAN_SYSTEM
 #  ifdef CONFIG_LV_BIG_ENDIAN_SYSTEM
 #    define LV_BIG_ENDIAN_SYSTEM CONFIG_LV_BIG_ENDIAN_SYSTEM
@@ -675,8 +677,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
- /* Attribute to mark large constant arrays for example
-  * font's bitmaps */
+/* Attribute to mark large constant arrays for example
+ * font's bitmaps */
 #ifndef LV_ATTRIBUTE_LARGE_CONST
 #  ifdef CONFIG_LV_ATTRIBUTE_LARGE_CONST
 #    define LV_ATTRIBUTE_LARGE_CONST CONFIG_LV_ATTRIBUTE_LARGE_CONST
@@ -685,8 +687,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-  /* Prefix performance critical functions to place them into a faster memory (e.g RAM)
-   * Uses 15-20 kB extra memory */
+/* Prefix performance critical functions to place them into a faster memory (e.g RAM)
+ * Uses 15-20 kB extra memory */
 #ifndef LV_ATTRIBUTE_FAST_MEM
 #  ifdef CONFIG_LV_ATTRIBUTE_FAST_MEM
 #    define LV_ATTRIBUTE_FAST_MEM CONFIG_LV_ATTRIBUTE_FAST_MEM
@@ -695,12 +697,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-   /* Export integer constant to binding.
-    * This macro is used with constants in the form of LV_<CONST> that
-    * should also appear on lvgl binding API such as Micropython
-    *
-    * The default value just prevents a GCC warning.
-    */
+/* Export integer constant to binding.
+ * This macro is used with constants in the form of LV_<CONST> that
+ * should also appear on lvgl binding API such as Micropython
+ *
+ * The default value just prevents a GCC warning.
+ */
 #ifndef LV_EXPORT_CONST_INT
 #  ifdef CONFIG_LV_EXPORT_CONST_INT
 #    define LV_EXPORT_CONST_INT CONFIG_LV_EXPORT_CONST_INT
@@ -709,8 +711,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-    /* Prefix variables that are used in GPU accelerated operations, often these need to be
-     * placed in RAM sections that are DMA accessible */
+/* Prefix variables that are used in GPU accelerated operations, often these need to be
+ * placed in RAM sections that are DMA accessible */
 #ifndef LV_ATTRIBUTE_DMA
 #  ifdef CONFIG_LV_ATTRIBUTE_DMA
 #    define LV_ATTRIBUTE_DMA CONFIG_LV_ATTRIBUTE_DMA
@@ -719,12 +721,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-     /*===================
-      *  HAL settings
-      *==================*/
+/*===================
+ *  HAL settings
+ *==================*/
 
-      /* 1: use a custom tick source.
-       * It removes the need to manually update the tick with `lv_tick_inc`) */
+/* 1: use a custom tick source.
+ * It removes the need to manually update the tick with `lv_tick_inc`) */
 #ifndef LV_TICK_CUSTOM
 #  ifdef CONFIG_LV_TICK_CUSTOM
 #    define LV_TICK_CUSTOM CONFIG_LV_TICK_CUSTOM
@@ -750,11 +752,11 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #endif   /*LV_TICK_CUSTOM*/
 
 
-       /*================
-        * Log settings
-        *===============*/
+/*================
+ * Log settings
+ *===============*/
 
-        /*1: Enable the log module*/
+/*1: Enable the log module*/
 #ifndef LV_USE_LOG
 #  ifdef CONFIG_LV_USE_LOG
 #    define LV_USE_LOG CONFIG_LV_USE_LOG
@@ -778,8 +780,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
- /* 1: Print the log with 'printf';
-  * 0: user need to register a callback with `lv_log_register_print_cb`*/
+/* 1: Print the log with 'printf';
+ * 0: user need to register a callback with `lv_log_register_print_cb`*/
 #ifndef LV_LOG_PRINTF
 #  ifdef CONFIG_LV_LOG_PRINTF
 #    define LV_LOG_PRINTF CONFIG_LV_LOG_PRINTF
@@ -789,19 +791,19 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #endif
 #endif  /*LV_USE_LOG*/
 
-  /*=================
-   * Debug settings
-   *================*/
+/*=================
+ * Debug settings
+ *================*/
 
-   /* If Debug is enabled LittelvGL validates the parameters of the functions.
-    * If an invalid parameter is found an error log message is printed and
-    * the MCU halts at the error. (`LV_USE_LOG` should be enabled)
-    * If you are debugging the MCU you can pause
-    * the debugger to see exactly where  the issue is.
-    *
-    * The behavior of asserts can be overwritten by redefining them here.
-    * E.g. #define LV_ASSERT_MEM(p)  <my_assert_code>
-    */
+/* If Debug is enabled LittelvGL validates the parameters of the functions.
+ * If an invalid parameter is found an error log message is printed and
+ * the MCU halts at the error. (`LV_USE_LOG` should be enabled)
+ * If you are debugging the MCU you can pause
+ * the debugger to see exactly where the issue is.
+ *
+ * The behavior of asserts can be overwritten by redefining them here.
+ * E.g. #define LV_ASSERT_MEM(p)  <my_assert_code>
+ */
 #ifndef LV_USE_DEBUG
 #  ifdef CONFIG_LV_USE_DEBUG
 #    define LV_USE_DEBUG CONFIG_LV_USE_DEBUG
@@ -811,7 +813,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #endif
 #if LV_USE_DEBUG
 
-    /*Check if the parameter is NULL. (Quite fast) */
+/*Check if the parameter is NULL. (Quite fast) */
 #ifndef LV_USE_ASSERT_NULL
 #  ifdef CONFIG_LV_USE_ASSERT_NULL
 #    define LV_USE_ASSERT_NULL CONFIG_LV_USE_ASSERT_NULL
@@ -849,8 +851,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
- /* Check NULL, the object's type and existence (e.g. not deleted). (Quite slow)
-  * If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled) */
+/* Check NULL, the object's type and existence (e.g. not deleted). (Quite slow)
+ * If disabled `LV_USE_ASSERT_NULL` will be performed instead (if it's enabled) */
 #ifndef LV_USE_ASSERT_OBJ
 #  ifdef CONFIG_LV_USE_ASSERT_OBJ
 #    define LV_USE_ASSERT_OBJ CONFIG_LV_USE_ASSERT_OBJ
@@ -859,7 +861,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-  /*Check if the styles are properly initialized. (Fast)*/
+/*Check if the styles are properly initialized. (Fast)*/
 #ifndef LV_USE_ASSERT_STYLE
 #  ifdef CONFIG_LV_USE_ASSERT_STYLE
 #    define LV_USE_ASSERT_STYLE CONFIG_LV_USE_ASSERT_STYLE
@@ -874,14 +876,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
  *    FONT USAGE
  *===================*/
 
- /* The built-in fonts contains the ASCII range and some Symbols with  4 bit-per-pixel.
-  * The symbols are available via `LV_SYMBOL_...` defines
-  * More info about fonts: https://docs.lvgl.io/v7/en/html/overview/font.html
-  * To create a new font go to: https://lvgl.com/ttf-font-to-c-array
-  */
+/* The built-in fonts contains the ASCII range and some Symbols with 4 bit-per-pixel.
+ * The symbols are available via `LV_SYMBOL_...` defines
+ * More info about fonts: https://docs.lvgl.io/v7/en/html/overview/font.html
+ * To create a new font go to: https://lvgl.com/ttf-font-to-c-array
+ */
 
-  /* Montserrat fonts with bpp = 4
-   * https://fonts.google.com/specimen/Montserrat  */
+/* Montserrat fonts with bpp = 4
+ * https://fonts.google.com/specimen/Montserrat  */
 #ifndef LV_FONT_MONTSERRAT_8
 #  ifdef CONFIG_LV_FONT_MONTSERRAT_8
 #    define LV_FONT_MONTSERRAT_8 CONFIG_LV_FONT_MONTSERRAT_8
@@ -1030,7 +1032,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-   /* Demonstrate special features */
+/* Demonstrate special features */
 #ifndef LV_FONT_MONTSERRAT_12_SUBPX
 #  ifdef CONFIG_LV_FONT_MONTSERRAT_12_SUBPX
 #    define LV_FONT_MONTSERRAT_12_SUBPX CONFIG_LV_FONT_MONTSERRAT_12_SUBPX
@@ -1077,12 +1079,12 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
- /* Optionally declare your custom fonts here.
-  * You can use these fonts as default font too
-  * and they will be available globally. E.g.
-  * #define LV_FONT_CUSTOM_DECLARE LV_FONT_DECLARE(my_font_1) \
-  *                                LV_FONT_DECLARE(my_font_2)
-  */
+/* Optionally declare your custom fonts here.
+ * You can use these fonts as default font too
+ * and they will be available globally. E.g.
+ * #define LV_FONT_CUSTOM_DECLARE LV_FONT_DECLARE(my_font_1) \
+ *                                LV_FONT_DECLARE(my_font_2)
+ */
 #ifndef LV_FONT_CUSTOM_DECLARE
 #  ifdef CONFIG_LV_FONT_CUSTOM_DECLARE
 #    define LV_FONT_CUSTOM_DECLARE CONFIG_LV_FONT_CUSTOM_DECLARE
@@ -1091,9 +1093,9 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-  /* Enable it if you have fonts with a lot of characters.
-   * The limit depends on the font size, font face and bpp
-   * but with > 10,000 characters if you see issues probably you need to enable it.*/
+/* Enable it if you have fonts with a lot of characters.
+ * The limit depends on the font size, font face and bpp
+ * but with > 10,000 characters if you see issues probably you need to enable it.*/
 #ifndef LV_FONT_FMT_TXT_LARGE
 #  ifdef CONFIG_LV_FONT_FMT_TXT_LARGE
 #    define LV_FONT_FMT_TXT_LARGE CONFIG_LV_FONT_FMT_TXT_LARGE
@@ -1102,9 +1104,9 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-   /* Enables/disables support for compressed fonts. If it's disabled, compressed
-    * glyphs cannot be processed by the library and won't be rendered.
-    */
+/* Enables/disables support for compressed fonts. If it's disabled, compressed
+ * glyphs cannot be processed by the library and won't be rendered.
+ */
 #ifndef LV_USE_FONT_COMPRESSED
 #  ifdef CONFIG_LV_USE_FONT_COMPRESSED
 #    define LV_USE_FONT_COMPRESSED CONFIG_LV_USE_FONT_COMPRESSED
@@ -1113,7 +1115,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-    /* Enable subpixel rendering */
+/* Enable subpixel rendering */
 #ifndef LV_USE_FONT_SUBPX
 #  ifdef CONFIG_LV_USE_FONT_SUBPX
 #    define LV_USE_FONT_SUBPX CONFIG_LV_USE_FONT_SUBPX
@@ -1135,16 +1137,16 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #endif
 #endif
 
- /*Declare the type of the user data of fonts (can be e.g. `void *`, `int`, `struct`)*/
+/*Declare the type of the user data of fonts (can be e.g. `void *`, `int`, `struct`)*/
 
- /*================
-  *  THEME USAGE
-  *================*/
+/*================
+ *  THEME USAGE
+ *================*/
 
-  /*Always enable at least on theme*/
+/*Always enable at least on theme*/
 
-  /* No theme, you can apply your styles as you need
-   * No flags. Set LV_THEME_DEFAULT_FLAG 0 */
+/* No theme, you can apply your styles as you need
+ * No flags. Set LV_THEME_DEFAULT_FLAG 0 */
 #ifndef LV_USE_THEME_EMPTY
 #  ifdef CONFIG_LV_USE_THEME_EMPTY
 #    define LV_USE_THEME_EMPTY CONFIG_LV_USE_THEME_EMPTY
@@ -1153,8 +1155,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-   /*Simple to the create your theme based on it
-    * No flags. Set LV_THEME_DEFAULT_FLAG 0 */
+/*Simple to the create your theme based on it
+ * No flags. Set LV_THEME_DEFAULT_FLAG 0 */
 #ifndef LV_USE_THEME_TEMPLATE
 #  ifdef CONFIG_LV_USE_THEME_TEMPLATE
 #    define LV_USE_THEME_TEMPLATE CONFIG_LV_USE_THEME_TEMPLATE
@@ -1163,13 +1165,13 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-    /* A fast and impressive theme.
-     * Flags:
-     * LV_THEME_MATERIAL_FLAG_LIGHT: light theme
-     * LV_THEME_MATERIAL_FLAG_DARK: dark theme
-     * LV_THEME_MATERIAL_FLAG_NO_TRANSITION: disable transitions (state change animations)
-     * LV_THEME_MATERIAL_FLAG_NO_FOCUS: disable indication of focused state)
-     * */
+/* A fast and impressive theme.
+ * Flags:
+ * LV_THEME_MATERIAL_FLAG_LIGHT: light theme
+ * LV_THEME_MATERIAL_FLAG_DARK: dark theme
+ * LV_THEME_MATERIAL_FLAG_NO_TRANSITION: disable transitions (state change animations)
+ * LV_THEME_MATERIAL_FLAG_NO_FOCUS: disable indication of focused state)
+ * */
 #ifndef LV_USE_THEME_MATERIAL
 #  ifdef CONFIG_LV_USE_THEME_MATERIAL
 #    define LV_USE_THEME_MATERIAL CONFIG_LV_USE_THEME_MATERIAL
@@ -1178,11 +1180,11 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-     /* Mono-color theme for monochrome displays.
-      * If LV_THEME_DEFAULT_COLOR_PRIMARY is LV_COLOR_BLACK the
-      * texts and borders will be black and the background will be
-      * white. Else the colors are inverted.
-      * No flags. Set LV_THEME_DEFAULT_FLAG 0 */
+/* Mono-color theme for monochrome displays.
+ * If LV_THEME_DEFAULT_COLOR_PRIMARY is LV_COLOR_BLACK the
+ * texts and borders will be black and the background will be
+ * white. Else the colors are inverted.
+ * No flags. Set LV_THEME_DEFAULT_FLAG 0 */
 #ifndef LV_USE_THEME_MONO
 #  ifdef CONFIG_LV_USE_THEME_MONO
 #    define LV_USE_THEME_MONO CONFIG_LV_USE_THEME_MONO
@@ -1255,15 +1257,15 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-      /*=================
-       *  Text settings
-       *=================*/
+/*=================
+ *  Text settings
+ *=================*/
 
-       /* Select a character encoding for strings.
-        * Your IDE or editor should have the same character encoding
-        * - LV_TXT_ENC_UTF8
-        * - LV_TXT_ENC_ASCII
-        * */
+/* Select a character encoding for strings.
+ * Your IDE or editor should have the same character encoding
+ * - LV_TXT_ENC_UTF8
+ * - LV_TXT_ENC_ASCII
+ * */
 #ifndef LV_TXT_ENC
 #  ifdef CONFIG_LV_TXT_ENC
 #    define LV_TXT_ENC CONFIG_LV_TXT_ENC
@@ -1272,7 +1274,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-        /*Can break (wrap) texts on these chars*/
+ /*Can break (wrap) texts on these chars*/
 #ifndef LV_TXT_BREAK_CHARS
 #  ifdef CONFIG_LV_TXT_BREAK_CHARS
 #    define LV_TXT_BREAK_CHARS CONFIG_LV_TXT_BREAK_CHARS
@@ -1291,8 +1293,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
- /* Minimum number of characters in a long word to put on a line before a break.
-  * Depends on LV_TXT_LINE_BREAK_LONG_LEN. */
+/* Minimum number of characters in a long word to put on a line before a break.
+ * Depends on LV_TXT_LINE_BREAK_LONG_LEN. */
 #ifndef LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
 #  ifdef CONFIG_LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
 #    define LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN CONFIG_LV_TXT_LINE_BREAK_LONG_PRE_MIN_LEN
@@ -1301,8 +1303,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-  /* Minimum number of characters in a long word to put on a line after a break.
-   * Depends on LV_TXT_LINE_BREAK_LONG_LEN. */
+/* Minimum number of characters in a long word to put on a line after a break.
+ * Depends on LV_TXT_LINE_BREAK_LONG_LEN. */
 #ifndef LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
 #  ifdef CONFIG_LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
 #    define LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN CONFIG_LV_TXT_LINE_BREAK_LONG_POST_MIN_LEN
@@ -1311,7 +1313,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-   /* The control character to use for signalling text recoloring. */
+/* The control character to use for signalling text recoloring. */
 #ifndef LV_TXT_COLOR_CMD
 #  ifdef CONFIG_LV_TXT_COLOR_CMD
 #    define LV_TXT_COLOR_CMD CONFIG_LV_TXT_COLOR_CMD
@@ -1332,10 +1334,10 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 #if LV_USE_BIDI
- /* Set the default direction. Supported values:
-  * `LV_BIDI_DIR_LTR` Left-to-Right
-  * `LV_BIDI_DIR_RTL` Right-to-Left
-  * `LV_BIDI_DIR_AUTO` detect texts base direction */
+/* Set the default direction. Supported values:
+ * `LV_BIDI_DIR_LTR` Left-to-Right
+ * `LV_BIDI_DIR_RTL` Right-to-Left
+ * `LV_BIDI_DIR_AUTO` detect texts base direction */
 #ifndef LV_BIDI_BASE_DIR_DEF
 #  ifdef CONFIG_LV_BIDI_BASE_DIR_DEF
 #    define LV_BIDI_BASE_DIR_DEF CONFIG_LV_BIDI_BASE_DIR_DEF
@@ -1345,9 +1347,9 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #endif
 #endif
 
-  /* Enable Arabic/Persian processing
-   * In these languages characters should be replaced with
-   * an other form based on their position in the text */
+/* Enable Arabic/Persian processing
+ * In these languages characters should be replaced with
+ * an other form based on their position in the text */
 #ifndef LV_USE_ARABIC_PERSIAN_CHARS
 #  ifdef CONFIG_LV_USE_ARABIC_PERSIAN_CHARS
 #    define LV_USE_ARABIC_PERSIAN_CHARS CONFIG_LV_USE_ARABIC_PERSIAN_CHARS
@@ -1356,7 +1358,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
-   /*Change the built in (v)snprintf functions*/
+/*Change the built in (v)snprintf functions*/
 #ifndef LV_SPRINTF_CUSTOM
 #  ifdef CONFIG_LV_SPRINTF_CUSTOM
 #    define LV_SPRINTF_CUSTOM CONFIG_LV_SPRINTF_CUSTOM
@@ -1401,8 +1403,8 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
  *==================*/
 
 #if LV_USE_USER_DATA
- /*Declare the type of the user data of object (can be e.g. `void *`, `int`, `struct`)*/
- /*Provide a function to free user data*/
+/*Declare the type of the user data of object (can be e.g. `void *`, `int`, `struct`)*/
+/*Provide a function to free user data*/
 #ifndef LV_USE_USER_DATA_FREE
 #  ifdef CONFIG_LV_USE_USER_DATA_FREE
 #    define LV_USE_USER_DATA_FREE CONFIG_LV_USE_USER_DATA_FREE
@@ -1451,14 +1453,14 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #  endif
 #endif
 
- /*==================
-  *  LV OBJ X USAGE
-  *================*/
-  /*
-   * Documentation of the object types: https://docs.lvgl.com/#Object-types
-   */
+/*==================
+ *  LV OBJ X USAGE
+ *================*/
+/*
+ * Documentation of the object types: https://docs.lvgl.com/#Object-types
+ */
 
-   /*Arc (dependencies: -)*/
+/*Arc (dependencies: -)*/
 #ifndef LV_USE_ARC
 #  ifdef CONFIG_LV_USE_ARC
 #    define LV_USE_ARC CONFIG_LV_USE_ARC
@@ -1754,7 +1756,7 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #endif
 #endif
 
- /*Mask (dependencies: -)*/
+/*Mask (dependencies: -)*/
 #ifndef LV_USE_OBJMASK
 #  ifdef CONFIG_LV_USE_OBJMASK
 #    define LV_USE_OBJMASK CONFIG_LV_USE_OBJMASK
@@ -1928,7 +1930,6 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 #endif
 #endif
 
-
 /*Tab (dependencies: lv_page, lv_btnm)*/
 #ifndef LV_USE_TABVIEW
 #  ifdef CONFIG_LV_USE_TABVIEW
@@ -1992,34 +1993,34 @@ e.g. "stm32f769xx.h" or "stm32f429xx.h" */
 
 
 
- /*If running without lv_conf.h add typdesf with default value*/
+/*If running without lv_conf.h add typdesf with default value*/
 #if defined(LV_CONF_SKIP)
 
   /* Type of coordinates. Should be `int16_t` (or `int32_t` for extreme cases) */
-typedef int16_t lv_coord_t;
+  typedef int16_t lv_coord_t;
 
 #  if LV_USE_ANIMATION
-/*Declare the type of the user data of animations (can be e.g. `void *`, `int`, `struct`)*/
-typedef void* lv_anim_user_data_t;
+  /*Declare the type of the user data of animations (can be e.g. `void *`, `int`, `struct`)*/
+  typedef void * lv_anim_user_data_t;
 #  endif
 
 #  if LV_USE_GROUP
-typedef void* lv_group_user_data_t;
+  typedef void * lv_group_user_data_t;
 #  endif
 
 #  if LV_USE_FILESYSTEM
-typedef void* lv_fs_drv_user_data_t;
+  typedef void * lv_fs_drv_user_data_t;
 #  endif
 
-typedef void* lv_img_decoder_user_data_t;
+  typedef void * lv_img_decoder_user_data_t;
 
-typedef void* lv_disp_drv_user_data_t;             /*Type of user data in the display driver*/
-typedef void* lv_indev_drv_user_data_t;            /*Type of user data in the input device driver*/
+  typedef void * lv_disp_drv_user_data_t;             /*Type of user data in the display driver*/
+  typedef void * lv_indev_drv_user_data_t;            /*Type of user data in the input device driver*/
 
-typedef void* lv_font_user_data_t;
+  typedef void * lv_font_user_data_t;
 
 #  if LV_USE_USER_DATA
-typedef void* lv_obj_user_data_t;
+  typedef void * lv_obj_user_data_t;
 #  endif
 
 #endif
